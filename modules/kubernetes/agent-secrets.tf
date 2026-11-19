@@ -6,11 +6,9 @@ locals {
   agent_secret_names = {
     coder = [
       var.key_vault_secret_names.agent_gpg_private_key,
-      var.key_vault_secret_names.julieio_goose_github_pat,
       var.key_vault_secret_names.vercel_ai_gateway_api_key,
     ]
     planner = [
-      var.key_vault_secret_names.julieio_goose_github_pat,
       var.key_vault_secret_names.vercel_ai_gateway_api_key,
     ]
   }

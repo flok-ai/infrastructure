@@ -124,10 +124,10 @@ resource "azurerm_role_assignment" "coder_on_gpg_key" {
   principal_id         = azurerm_user_assigned_identity.workloads["coder"].principal_id
 }
 
-# Long-lived credentials are already needed in these pods; grants stay per secret (#26).
+# Grants stay per secret (#26). The shared GitHub PAT was retired in #38: agents get
+# short-lived GitHub tokens from the broker. Map keys keep existing resource addresses.
 resource "azurerm_role_assignment" "coder_on_agent_secrets" {
   for_each = {
-    github_pat = var.key_vault_secret_names.julieio_goose_github_pat
     ai_gateway = var.key_vault_secret_names.vercel_ai_gateway_api_key
   }
   role_definition_name = "Key Vault Secrets User"
@@ -137,7 +137,6 @@ resource "azurerm_role_assignment" "coder_on_agent_secrets" {
 
 resource "azurerm_role_assignment" "planner_on_agent_secrets" {
   for_each = {
-    github_pat = var.key_vault_secret_names.julieio_goose_github_pat
     ai_gateway = var.key_vault_secret_names.vercel_ai_gateway_api_key
   }
   role_definition_name = "Key Vault Secrets User"

@@ -148,7 +148,6 @@ KEY VAULT  ai-sdlc-{suffix}-kv                      ·· no workload grant at va
 ├─ secret  platform-services-hmac-key     ◄── Secrets User ── platform-services-mi
 ├─ secret  token-broker-gh-app-private-key◄── Secrets User ── gh-token-broker-mi
 ├─ secret  agent-gpg-private-key          ◄── Secrets User ── coder-mi
-├─ secret  julieio-goose-github-pat       ◄── Secrets User ── coder-mi, planner-mi
 ├─ secret  vercel-ai-gateway-api-key      ◄── Secrets User ── coder-mi, planner-mi
 ├─ secret  agent-gpg-public-key           ·· none
 ├─ secret  agent-gpg-fingerprint          ·· none
@@ -190,7 +189,6 @@ One table per service. Rows are the narrowest scope a grant can land on; columns
 | `platform-services-hmac-key` | Read | | | | |
 | `token-broker-gh-app-private-key` | | | Read | | |
 | `agent-gpg-private-key` | | | | | Read |
-| `julieio-goose-github-pat` | | | | Read | Read |
 | `vercel-ai-gateway-api-key` | | | | Read | Read |
 | `agent-gpg-public-key` | | | | | |
 | `agent-gpg-fingerprint` | | | | | |
@@ -255,6 +253,9 @@ The network rules let every node reach these services. Only the identity grants 
 
 Open checks; completed ones are in the [verification log](./docs/verification-log.md). No Azure or cluster commands were run by the agent.
 
+- [ ] #38 human-run plan only destroys `planner_on_agent_secrets["github_pat"]` and `coder_on_agent_secrets["github_pat"]` (identities stage) and updates `agent_secrets["planner"]` and `agent_secrets["coder"]` in place to drop the PAT object (kubernetes stage); the `ai_gateway` grants and the GPG key grant are unchanged.
+- [ ] #38 after apply, a workflow run succeeds end to end with GitHub tokens from the broker; planner and coder pods no longer have `/mnt/agent-secrets/julieio-goose-github-pat`.
+- [ ] #38 human revokes the PAT on GitHub and deletes `julieio-goose-github-pat` from Key Vault.
 - [ ] #36 human-run plan adds exactly eight resources: one SecretProviderClass, one ClusterRole and binding, one Role and binding, one managed identity, its federated credential and one AcrPush assignment; no existing resources change.
 - [ ] #36 broker CSI mount reads the App key as file `token-broker-gh-app-private-key` without logging it; actual mount requires the broker Deployment from its own repository.
 - [ ] #36 broker repository's `production` workflow exchanges its OIDC token and pushes to ACR using `github_workflows.github_broker.client_id`; no cluster identity gets push.

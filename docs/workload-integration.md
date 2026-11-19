@@ -18,12 +18,12 @@ Key Vault values were populated under #21. Don't rerun initialization or reset f
 - Create each HMAC Secret with a same-namespace Workflow ownerReference using `{{workflow.name}}` and `{{workflow.uid}}`, and `blockOwnerDeletion: false`. No Workflow-read or finalizer permissions are needed. The Role grants only `secrets: create`; it permits any Secret name in `agents`, accepted because this step is trusted. The agent steps mount only their own HMAC Secret; tokens never go through Argo parameters.
 - `deny-imds` stays unchanged. CSI workload identity does not need workload-pod IMDS access. This policy permits other egress; adding a narrower allow policy would not restrict it because NetworkPolicies are additive.
 
-## Planner and coder secret mounts (#18, #26)
+## Planner and coder secret mounts (#18, #26, #38)
 
 | ServiceAccount / identity | SecretProviderClass | Mounted file names |
 |---|---|---|
-| `coder` / `coder-mi` | `coder-secrets` | `agent-gpg-private-key`, `julieio-goose-github-pat`, `vercel-ai-gateway-api-key` |
-| `planner` / `planner-mi` | `planner-secrets` | `julieio-goose-github-pat`, `vercel-ai-gateway-api-key` |
+| `coder` / `coder-mi` | `coder-secrets` | `agent-gpg-private-key`, `vercel-ai-gateway-api-key` |
+| `planner` / `planner-mi` | `planner-secrets` | `vercel-ai-gateway-api-key` |
 
 - Root `agent_secret_provider_class_names` selects the two roles and their class names; `key_vault_secret_names` supplies object/file names.
 - In the workflows repo, set `serviceAccountName` to the role and label the pod `azure.workload.identity/use: "true"`. Add a read-only CSI volume using the matching class and mount it in the main container only. The example uses coder; for planner use `planner` and `planner-secrets`.
@@ -50,8 +50,8 @@ spec:
   #   readOnly: true
 ```
 
-- Files appear under `/mnt/agent-secrets/<object-name>`. The agent entrypoint maps the PAT to `GH_TOKEN` and the gateway key to `AI_GATEWAY_API_KEY`; coder imports the private key into its private GPG home. Do not print values or pass them through Argo parameters. No Kubernetes Secret synchronization is configured.
-- The PAT is deliberately shared with planner: it can push within its token permissions. Main-branch rulesets still require a PR and signed commits; they do not make planner read-only. The token broker is the deferred replacement ([#26](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/26)).
+- Files appear under `/mnt/agent-secrets/<object-name>`. The agent entrypoint maps the gateway key to `AI_GATEWAY_API_KEY`; coder imports the private key into its private GPG home. Do not print values or pass them through Argo parameters. No Kubernetes Secret synchronization is configured.
+- No GitHub credential is mounted. The shared PAT was retired in [#38](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/38); the workflow gets short-lived GitHub tokens from the broker.
 - CSI uses workload identity; the node CSI add-on identity gets no grant. Per-run HMAC tokens remain with foreman.
 
 > [!IMPORTANT]
