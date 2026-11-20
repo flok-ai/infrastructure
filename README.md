@@ -254,3 +254,9 @@ The network rules let every node reach these services. Only the identity grants 
 No open checks as of 2026-11-20; completed ones are in the [verification log](./docs/verification-log.md). Add new ones here as features land. No Azure or cluster commands were run by the agent.
 
 Not built yet: Argo database roles and authentication ([#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33)).
+
+## License
+
+[flok](https://github.com/flok-ai) infrastructure is licensed under the [GNU Affero General Public License v3.0 only](./LICENSE) (AGPL-3.0-only). Copies, modified versions and network deployments must keep the attribution described in [NOTICE](./NOTICE).
+
+Versions up to and including v0.1.0 were released under the MIT License.
