@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.2.0] - 2026-11-20
+
+Relicensed for the move to [flok](https://github.com/flok-ai).
+
+### Changed
+
+- License changed from MIT to the GNU Affero General Public License v3.0 only (AGPL-3.0-only). Copies, modified versions and network deployments must keep the attribution in `NOTICE`. Versions up to and including 0.1.0 remain MIT.
+
+### Added
+
+- `NOTICE` with the attribution term, `REUSE.toml` and `CONTRIBUTING.md`.
+
 ## [0.1.0] - 2026-11-20
 
 Initial release: Terraform for the platform on Azure, deployed and verified. Every component runs on short-lived, scoped credentials.
@@ -25,4 +37,5 @@ Initial release: Terraform for the platform on Azure, deployed and verified. Eve
 
 - Shared GitHub token (PAT) from agent secret mounts and Key Vault grants; agents get GitHub tokens from the broker ([#39](https://github.com/julie-ng/ai-native-sdlc-infrastructure/pull/39)).
 
+[0.2.0]: https://github.com/julie-ng/ai-native-sdlc-infrastructure/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/julie-ng/ai-native-sdlc-infrastructure/releases/tag/v0.1.0
