@@ -253,10 +253,7 @@ The network rules let every node reach these services. Only the identity grants 
 
 Open checks; completed ones are in the [verification log](./docs/verification-log.md). No Azure or cluster commands were run by the agent.
 
-- [ ] #38 human-run plan only destroys `planner_on_agent_secrets["github_pat"]` and `coder_on_agent_secrets["github_pat"]` (identities stage) and updates `agent_secrets["planner"]` and `agent_secrets["coder"]` in place to drop the PAT object (kubernetes stage); the `ai_gateway` grants and the GPG key grant are unchanged.
-- [ ] #38 after apply, a workflow run succeeds end to end with GitHub tokens from the broker; planner and coder pods no longer have `/mnt/agent-secrets/julieio-goose-github-pat`.
-- [ ] #38 human revokes the PAT on GitHub and deletes `julieio-goose-github-pat` from Key Vault.
-- [ ] #36 human-run plan adds exactly eight resources: one SecretProviderClass, one ClusterRole and binding, one Role and binding, one managed identity, its federated credential and one AcrPush assignment; no existing resources change.
+- [ ] #38 human deletes `julieio-goose-github-pat` from Key Vault. The PAT is already revoked on GitHub, so the stored value no longer works; deletion waits for an admin IP on the Key Vault firewall.
 - [ ] Key Vault seed command against Azure: creates missing placeholders, preserves Portal-created versions on rerun, and fails cleanly if firewall/RBAC denies access. Verified offline with mocked CLI calls only.
 - [ ] #19 identity retirement: removal of old federations/grants, including the vault-wide broker grant; no secret values modified.
 - [ ] #26: planner fails to read `agent-gpg-private-key` directly with its own identity. Not attempted; the grant listing shows planner has no grant on it.

@@ -39,6 +39,14 @@ Live proof on 2026-11-18 passed 9 of 9 checks from test pods in `agents`; see th
 - [x] #36 ACR push: the broker repository's `production` workflow exchanged its OIDC token and pushed the image to ACR (2026-11-13; the first attempt failed with `AADSTS700211` and succeeded on re-run).
 - [x] #36 broker RBAC (2026-11-18): `create tokenreviews` and `get pods -n agents` return `yes`; `get secrets -n agents` and `list pods -n agents` return `no`, checked with `kubectl auth can-i … --as=system:serviceaccount:github-broker:token-broker`.
 - [x] #36 broker CSI mount: the broker pod in `github-broker` mounts `token-broker-gh-app-private-key` from `github-broker-secrets` through `gh-token-broker-mi`, and signs App JWTs with it; issued installation tokens worked against GitHub. No token appeared in the broker log.
+- [x] #36 plan: applied 2026-11-13 with the expected eight new resources and no changes to existing ones. Confirmed by the human developer from memory; the plan output was not recorded.
+
+## Shared PAT retired (#38, 2026-11-20)
+
+- [x] Plan and apply: only the two `github_pat` grants for `planner-mi` and `coder-mi` were destroyed, and `planner-secrets` and `coder-secrets` were updated in place; the `ai_gateway` and GPG key grants are unchanged.
+- [x] Neither SecretProviderClass references the PAT any more: `kubectl get secretproviderclass planner-secrets coder-secrets -n agents -o yaml | grep -c github-pat` returns `0`.
+- [x] After the apply, an `initial-release` run on the test repository's issue #5 succeeded end to end with broker tokens ([aks-architect-ai#8](https://github.com/julie-ng/aks-architect-ai/pull/8)): the PR was opened by `julieio-ai-sdlc[bot]`, its commit by `julieio-goose` shows **Verified**, and CI passed.
+- [x] The PAT is revoked on GitHub. Deleting the Key Vault secret is still open; see the README.
 
 ## Argo Workflows (2026-11-05)
 
