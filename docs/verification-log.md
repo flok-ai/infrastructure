@@ -16,6 +16,7 @@ Provisioning of all infrastructure modules was confirmed on 2026-10-22: networki
 
 - [x] `local-dev` service principal: Entra app registration created by the applying identity, credential created with `make local-dev-credential`, and user delegation SAS URLs generated with it against the `artifacts` account.
 - [x] `make reset-sdlc-secrets`: run and the resulting values checked in Azure Portal on 2026-11-05; `token-broker-gh-app-private-key` remained unchanged. Temporary GPG isolation/cleanup and key properties were checked offline with mocked uploads.
+- [x] `make init-kv-secrets` against Azure: created the missing placeholders (every listed secret exists and the platform runs on the populated values), and a rerun in the week of 2026-11-09 skipped every existing secret without replacing values. Firewall/RBAC denial is Azure's behavior, not this script's, and is not tracked.
 - [x] #19 identity replacement: plan reviewed and applied on 2026-11-05. `workflow-service-mi` and `artifact-service-mi` were replaced by `platform-services-mi`, `token-broker-mi` by `gh-token-broker-mi`, and `foreman-mi` was added. Workload-identity `prevent_destroy` was restored afterwards.
 - [x] `platform-services-mi` database grants on `workflow` applied on 2026-11-10; `has_database_privilege('platform-services-mi', 'workflow', 'CREATE')` returns `t` ([#31](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/31)).
 
@@ -31,6 +32,45 @@ End to end on 2026-11-11: workflow `initial-release-gxqw4` (`foreman → planner
 - [x] `platform-services-mi` (2026-11-10): authenticates to PostgreSQL with an Entra token and runs its startup migrations; signs user delegation SAS URLs for Blob upload and download, tested from a pod in `agents`.
 - [x] #29: the `platform-services` pod in `platform` mounts both files from `platform-services-secrets`. `POST /api/runs` with the Key Vault admin token returned 201 and issued HMAC step tokens, so both files loaded.
 - [x] Agent workflows and application integrations: platform services, Blob Storage, the AI gateway and GitHub all worked from the cluster in `initial-release-gxqw4`. No secrets were found in its logs.
+
+## GitHub token broker (2026-11-13 to 2026-11-18)
+
+Live proof on 2026-11-18 passed 9 of 9 checks from test pods in `agents`; see the [broker README](https://github.com/julie-ng/ai-native-sdlc-github-broker#live-verification). The checks below are what it proved for this repo.
+
+- [x] #36 ACR push: the broker repository's `production` workflow exchanged its OIDC token and pushed the image to ACR (2026-11-13; the first attempt failed with `AADSTS700211` and succeeded on re-run).
+- [x] #36 broker RBAC (2026-11-18): `create tokenreviews` and `get pods -n agents` return `yes`; `get secrets -n agents` and `list pods -n agents` return `no`, checked with `kubectl auth can-i … --as=system:serviceaccount:github-broker:token-broker`.
+- [x] #36 broker CSI mount: the broker pod in `github-broker` mounts `token-broker-gh-app-private-key` from `github-broker-secrets` through `gh-token-broker-mi`, and signs App JWTs with it; issued installation tokens worked against GitHub. No token appeared in the broker log.
+- [x] #36 resources (2026-11-20): `terraform state list` contains all eight: the `github_broker_secrets` SecretProviderClass, the `token_broker` ClusterRole, ClusterRoleBinding, Role and RoleBinding, `github_broker_mi`, its `github_broker_prod_environment` federated credential and `github_broker_acr_push`. `make plan` reports no changes. The original 2026-11-13 plan output was not recorded.
+
+## Shared PAT retired (#38, 2026-11-20)
+
+- [x] Plan and apply: only the two `github_pat` grants for `planner-mi` and `coder-mi` were destroyed, and `planner-secrets` and `coder-secrets` were updated in place; the `ai_gateway` and GPG key grants are unchanged.
+- [x] Neither SecretProviderClass references the PAT any more: `kubectl get secretproviderclass planner-secrets coder-secrets -n agents -o yaml | grep -c github-pat` returns `0`.
+- [x] After the apply, an `initial-release` run on the test repository's issue #5 succeeded end to end with broker tokens ([aks-architect-ai#8](https://github.com/julie-ng/aks-architect-ai/pull/8)): the PR was opened by `julieio-ai-sdlc[bot]`, its commit by `julieio-goose` shows **Verified**, and CI passed.
+- [x] The PAT is revoked on GitHub. Deleting the Key Vault secret is tracked in [#41](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/41).
+
+## Access re-checked (2026-11-20)
+
+Read-only checks after the broker and PAT changes.
+
+- [x] Role assignments per identity, `az role assignment list --assignee <principal> --all --include-inherited`: every grant matches the [access matrix](../README.md#access-matrix), with nothing at vault, resource group or subscription scope.
+  - `planner-mi`: `Key Vault Secrets User` on `vercel-ai-gateway-api-key` only, so it cannot read `agent-gpg-private-key` (#26).
+  - `coder-mi`: `Key Vault Secrets User` on `agent-gpg-private-key` and `vercel-ai-gateway-api-key`.
+  - `foreman-mi`: `Key Vault Secrets User` on `platform-services-admin-token`.
+  - `platform-services-mi`: `Key Vault Secrets User` on `platform-services-admin-token` and `platform-services-hmac-key`; `Storage Blob Delegator` on the `artifacts` account; `Storage Blob Data Contributor` on the `artifacts` container.
+  - `gh-token-broker-mi`: `Key Vault Secrets User` on `token-broker-gh-app-private-key` only, so it cannot read the platform secrets.
+- [x] #19 identity retirement: no orphaned role assignments (deleted principals) on this project's resources. Orphans elsewhere in the subscription belong to unrelated workloads.
+- [x] IMDS still blocked from `agents` after the workload identity and CSI changes: `curl` to `169.254.169.254` from a pod in `agents` timed out after 5 seconds.
+- [x] `foreman` ServiceAccount: `kubectl auth can-i` returns `no` for get/list/update/patch/delete on Secrets and get/list on Workflows in `agents`.
+- [x] `foreman-admin-token` cannot be mounted by another ServiceAccount: a labeled `planner` pod using that SecretProviderClass stayed in `ContainerCreating` with `FailedMount`, `ClientAssertionCredential authentication failed … 401 Unauthorized` (`foreman-mi` has no federation for `agents:planner`).
+
+## Monitoring (2026-11-20)
+
+Log Analytics queries on the `Usage` and `ContainerLogV2` tables.
+
+- [x] Tables, last 7 days: only `ContainerLogV2` (0.8 MB), `KubePodInventory` (0.7 MB), `Heartbeat` (0.6 MB) and `KubeEvents` (0.1 MB). No `Perf`, `InsightsMetrics` or other inventory tables.
+- [x] Volume, last 14 days: at most 1.7 MB on any day the cluster ran, against the 0.1 GB/day cap. The cap was never reached, so cap behavior itself was not observed; it is Azure's documented behavior.
+- [x] Container log filter, last 7 days: lines only from `agents`, `github-broker`, `argo` and `platform`; nothing from `kube-system` or the other excluded namespaces.
 
 ## Argo Workflows (2026-11-05)
 

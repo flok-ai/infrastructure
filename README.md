@@ -3,7 +3,7 @@
 Terraform for the AI SDLC platform on Azure: one AKS cluster plus the backing services it needs. Single environment (dev).
 
 > [!IMPORTANT]
-> All infrastructure modules were deployed successfully by the human developer on 2026-10-22. Argo hello-world succeeded on 2026-11-05; platform services and agent workflows have not been tested. Agents verify offline only; see [Unverified](#unverified).
+> All infrastructure modules were deployed successfully by the human developer on 2026-10-22. Argo hello-world succeeded on 2026-11-05. The agent workflow ran end to end on 2026-11-11, and the GitHub token broker was verified live on 2026-11-18. Agents verify offline only; see [Unverified](#unverified).
 
 ## Docs
 
@@ -251,31 +251,6 @@ The network rules let every node reach these services. Only the identity grants 
 
 ## Unverified
 
-Open checks; completed ones are in the [verification log](./docs/verification-log.md). No Azure or cluster commands were run by the agent.
+No open checks as of 2026-11-20; completed ones are in the [verification log](./docs/verification-log.md). Add new ones here as features land. No Azure or cluster commands were run by the agent.
 
-- [ ] #38 human-run plan only destroys `planner_on_agent_secrets["github_pat"]` and `coder_on_agent_secrets["github_pat"]` (identities stage) and updates `agent_secrets["planner"]` and `agent_secrets["coder"]` in place to drop the PAT object (kubernetes stage); the `ai_gateway` grants and the GPG key grant are unchanged.
-- [ ] #38 after apply, a workflow run succeeds end to end with GitHub tokens from the broker; planner and coder pods no longer have `/mnt/agent-secrets/julieio-goose-github-pat`.
-- [ ] #38 human revokes the PAT on GitHub and deletes `julieio-goose-github-pat` from Key Vault.
-- [ ] #36 human-run plan adds exactly eight resources: one SecretProviderClass, one ClusterRole and binding, one Role and binding, one managed identity, its federated credential and one AcrPush assignment; no existing resources change.
-- [ ] #36 broker CSI mount reads the App key as file `token-broker-gh-app-private-key` without logging it; actual mount requires the broker Deployment from its own repository.
-- [ ] #36 broker repository's `production` workflow exchanges its OIDC token and pushes to ACR using `github_workflows.github_broker.client_id`; no cluster identity gets push.
-- [ ] #36 broker RBAC after human apply (default namespace names below):
-
-  ```sh
-  kubectl auth can-i create tokenreviews --as=system:serviceaccount:github-broker:token-broker # yes
-  kubectl auth can-i get pods -n agents --as=system:serviceaccount:github-broker:token-broker # yes
-  kubectl auth can-i get secrets -n agents --as=system:serviceaccount:github-broker:token-broker # no
-  kubectl auth can-i list pods -n agents --as=system:serviceaccount:github-broker:token-broker # no
-  ```
-
-- [ ] Key Vault seed command against Azure: creates missing placeholders, preserves Portal-created versions on rerun, and fails cleanly if firewall/RBAC denies access. Verified offline with mocked CLI calls only.
-- [ ] #19 identity retirement: removal of old federations/grants, including the vault-wide broker grant; no secret values modified.
-- [ ] #26: planner fails to read `agent-gpg-private-key` directly with its own identity. Not attempted; the grant listing shows planner has no grant on it.
-- [ ] IMDS still blocked from `agents` pods after the workload identity and CSI changes. `deny-imds` is unchanged since #4 but was not re-tested.
-- [ ] `foreman`: an unrelated ServiceAccount cannot mount `foreman-admin-token` using foreman's identity; `foreman` cannot get/list/update/patch/delete Secrets or read Workflows.
-- [ ] `platform-services-mi` reads only its admin/HMAC secrets (grants not listed); `gh-token-broker-mi` can read the GitHub App private key but not those secrets (broker not built).
-- [ ] The SecretProviderClass CRD exists before `make plan-k8s`. `kubernetes_manifest` needs its schema at plan time; on a new cluster, apply the cluster stage (CSI add-on) first.
-- [ ] Argo database roles and authentication ([#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33)).
-- [ ] CRD version upgrades, uninstall/reinstall and the sample devcontainer Helm feature build.
-- [ ] Monitoring table selection, ConfigMap filters, observed ingestion volume and cap behavior. Successful resource deployment does not prove logs are flowing or filtering correctly.
-- [ ] Identity continuity across a cluster rebuild.
+Not built yet: Argo database roles and authentication ([#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33)).
