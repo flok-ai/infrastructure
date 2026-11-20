@@ -6,7 +6,7 @@ A minimal ruleset to use as inspiration: give agents freedom to work on their ow
 
 Ruleset denies creation and deletion of all branches, _except_:
 
-- `agents/**/*`
+- `agent/**/*`
 - `claude/**/*`
 - `codex/**/*`
 
