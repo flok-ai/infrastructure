@@ -46,6 +46,7 @@ make plan            # expect: no changes
 - `-target` is used for staging only. The final untargeted `plan` confirms nothing was missed.
 - Cluster commands use the separate `cluster` root output, which depends only on `module.cluster`. The combined `summary` output may not be saved until the Kubernetes stage is applied.
 - Identities and their role assignments on shared resources survive cluster rebuilds. Cluster recreation updates workload federation to its OIDC issuer. The identity resource group and all managed identities have `prevent_destroy` guards.
+- On a new cluster, apply the cluster stage before `make plan-k8s`: `kubernetes_manifest` needs the SecretProviderClass CRD schema at plan time, and the CRD comes with the cluster's CSI add-on.
 - Apply `module.kubernetes` immediately after the cluster stage: it installs the monitor agent ConfigMap. See [monitoring costs](./monitoring.md).
 
 > [!NOTE]

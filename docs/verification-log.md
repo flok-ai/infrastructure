@@ -48,6 +48,20 @@ Live proof on 2026-11-18 passed 9 of 9 checks from test pods in `agents`; see th
 - [x] After the apply, an `initial-release` run on the test repository's issue #5 succeeded end to end with broker tokens ([aks-architect-ai#8](https://github.com/julie-ng/aks-architect-ai/pull/8)): the PR was opened by `julieio-ai-sdlc[bot]`, its commit by `julieio-goose` shows **Verified**, and CI passed.
 - [x] The PAT is revoked on GitHub. Deleting the Key Vault secret is still open; see the README.
 
+## Access re-checked (2026-11-20)
+
+Read-only checks after the broker and PAT changes.
+
+- [x] Role assignments per identity, `az role assignment list --assignee <principal> --all --include-inherited`: every grant matches the [access matrix](../README.md#access-matrix), with nothing at vault, resource group or subscription scope.
+  - `planner-mi`: `Key Vault Secrets User` on `vercel-ai-gateway-api-key` only, so it cannot read `agent-gpg-private-key` (#26).
+  - `coder-mi`: `Key Vault Secrets User` on `agent-gpg-private-key` and `vercel-ai-gateway-api-key`.
+  - `foreman-mi`: `Key Vault Secrets User` on `platform-services-admin-token`.
+  - `platform-services-mi`: `Key Vault Secrets User` on `platform-services-admin-token` and `platform-services-hmac-key`; `Storage Blob Delegator` on the `artifacts` account; `Storage Blob Data Contributor` on the `artifacts` container.
+  - `gh-token-broker-mi`: `Key Vault Secrets User` on `token-broker-gh-app-private-key` only, so it cannot read the platform secrets.
+- [x] #19 identity retirement: no orphaned role assignments (deleted principals) on this project's resources. Orphans elsewhere in the subscription belong to unrelated workloads.
+- [x] IMDS still blocked from `agents` after the workload identity and CSI changes: `curl` to `169.254.169.254` from a pod in `agents` timed out after 5 seconds.
+- [x] `foreman` ServiceAccount: `kubectl auth can-i` returns `no` for get/list/update/patch/delete on Secrets and get/list on Workflows in `agents`.
+
 ## Argo Workflows (2026-11-05)
 
 - [x] Applied the four controller RBAC resources, installed chart 2.0.16 / Argo v4.1.6, and created the executor token Secret. Workflow `hello-world-7xzjr` succeeded in `agents` as `planner` (1/1 step, 20 seconds), confirming executor result reporting under `deny-imds`.

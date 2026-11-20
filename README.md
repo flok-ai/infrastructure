@@ -255,13 +255,17 @@ Open checks; completed ones are in the [verification log](./docs/verification-lo
 
 - [ ] #38 human deletes `julieio-goose-github-pat` from Key Vault. The PAT is already revoked on GitHub, so the stored value no longer works; deletion waits for an admin IP on the Key Vault firewall.
 - [ ] Key Vault seed command against Azure: creates missing placeholders, preserves Portal-created versions on rerun, and fails cleanly if firewall/RBAC denies access. Verified offline with mocked CLI calls only.
-- [ ] #19 identity retirement: removal of old federations/grants, including the vault-wide broker grant; no secret values modified.
-- [ ] #26: planner fails to read `agent-gpg-private-key` directly with its own identity. Not attempted; the grant listing shows planner has no grant on it.
-- [ ] IMDS still blocked from `agents` pods after the workload identity and CSI changes. `deny-imds` is unchanged since #4 but was not re-tested.
-- [ ] `foreman`: an unrelated ServiceAccount cannot mount `foreman-admin-token` using foreman's identity; `foreman` cannot get/list/update/patch/delete Secrets or read Workflows.
-- [ ] `platform-services-mi` reads only its admin/HMAC secrets (grants not listed); `gh-token-broker-mi` cannot read those secrets (not attempted; its read of the App key is verified).
-- [ ] The SecretProviderClass CRD exists before `make plan-k8s`. `kubernetes_manifest` needs its schema at plan time; on a new cluster, apply the cluster stage (CSI add-on) first.
-- [ ] Argo database roles and authentication ([#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33)).
-- [ ] CRD version upgrades, uninstall/reinstall and the sample devcontainer Helm feature build.
+- [ ] `foreman`: an unrelated ServiceAccount cannot mount `foreman-admin-token` using foreman's identity. Needs a test pod; not attempted.
 - [ ] Monitoring table selection, ConfigMap filters, observed ingestion volume and cap behavior. Successful resource deployment does not prove logs are flowing or filtering correctly.
+
+### Not tested until a rebuild or upgrade
+
+These only show up when the cluster is rebuilt or a component is upgraded.
+
 - [ ] Identity continuity across a cluster rebuild.
+- [ ] On a new cluster, the SecretProviderClass CRD exists before `make plan-k8s` (see [deployment](./docs/deployment.md#deploy)).
+- [ ] CRD version upgrades, uninstall/reinstall and the sample devcontainer Helm feature build.
+
+### Not built yet
+
+- Argo database roles and authentication: [#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33).
