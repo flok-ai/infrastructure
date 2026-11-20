@@ -46,7 +46,7 @@ Live proof on 2026-11-18 passed 9 of 9 checks from test pods in `agents`; see th
 - [x] Plan and apply: only the two `github_pat` grants for `planner-mi` and `coder-mi` were destroyed, and `planner-secrets` and `coder-secrets` were updated in place; the `ai_gateway` and GPG key grants are unchanged.
 - [x] Neither SecretProviderClass references the PAT any more: `kubectl get secretproviderclass planner-secrets coder-secrets -n agents -o yaml | grep -c github-pat` returns `0`.
 - [x] After the apply, an `initial-release` run on the test repository's issue #5 succeeded end to end with broker tokens ([aks-architect-ai#8](https://github.com/julie-ng/aks-architect-ai/pull/8)): the PR was opened by `julieio-ai-sdlc[bot]`, its commit by `julieio-goose` shows **Verified**, and CI passed.
-- [x] The PAT is revoked on GitHub. Deleting the Key Vault secret is still open; see the README.
+- [x] The PAT is revoked on GitHub. Deleting the Key Vault secret is tracked in [#41](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/41).
 
 ## Access re-checked (2026-11-20)
 
