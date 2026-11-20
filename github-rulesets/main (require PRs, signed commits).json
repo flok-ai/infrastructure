@@ -3,7 +3,7 @@
   "name": "main (require PRs, signed commits)",
   "target": "branch",
   "source_type": "Repository",
-  "source": "flok-ai/agent-images",
+  "source": "flok-ai/REPO_NAME_HERE",
   "enforcement": "active",
   "conditions": {
     "ref_name": {
@@ -50,8 +50,8 @@
   ],
   "bypass_actors": [
     {
-      "actor_id": 5,
-      "actor_type": "RepositoryRole",
+      "actor_id": null,
+      "actor_type": "OrganizationAdmin",
       "bypass_mode": "always"
     }
   ]
