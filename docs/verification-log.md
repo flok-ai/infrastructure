@@ -62,6 +62,7 @@ Read-only checks after the broker and PAT changes.
 - [x] #19 identity retirement: no orphaned role assignments (deleted principals) on this project's resources. Orphans elsewhere in the subscription belong to unrelated workloads.
 - [x] IMDS still blocked from `agents` after the workload identity and CSI changes: `curl` to `169.254.169.254` from a pod in `agents` timed out after 5 seconds.
 - [x] `foreman` ServiceAccount: `kubectl auth can-i` returns `no` for get/list/update/patch/delete on Secrets and get/list on Workflows in `agents`.
+- [x] `foreman-admin-token` cannot be mounted by another ServiceAccount: a labeled `planner` pod using that SecretProviderClass stayed in `ContainerCreating` with `FailedMount`, `ClientAssertionCredential authentication failed … 401 Unauthorized` (`foreman-mi` has no federation for `agents:planner`).
 
 ## Argo Workflows (2026-11-05)
 
