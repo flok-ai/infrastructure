@@ -1,6 +1,6 @@
-# AI-native SDLC — Infrastructure
+# flok infrastructure
 
-Terraform for the AI SDLC platform on Azure: one AKS cluster plus the backing services it needs. Single environment (dev).
+Terraform for [flok](https://github.com/flok-ai) on Azure: one AKS cluster plus the backing services it needs. Single environment (dev).
 
 > [!IMPORTANT]
 > All infrastructure modules were deployed successfully by the human developer on 2026-10-22. Argo hello-world succeeded on 2026-11-05. The agent workflow ran end to end on 2026-11-11, and the GitHub token broker was verified live on 2026-11-18. Agents verify offline only; see [Unverified](#unverified).
@@ -66,7 +66,7 @@ Resource group names carry no random suffix. AKS creates its own node resources 
 |---|---|
 | Key Vault, both storage accounts | Public endpoint, default deny. Allow AKS subnet via service endpoint and `admin_ip_ranges`; trusted Azure service bypass is also enabled. Authentication and role assignments still apply. |
 | PostgreSQL | Public endpoint, firewall: cluster egress IP, `admin_ip_ranges`. Flexible Server has no service endpoint support. Public endpoint does not imply public-internet routing between Azure services; see [Microsoft global network](https://learn.microsoft.com/en-us/azure/networking/microsoft-global-network). |
-| ACR | Public endpoint. Basic SKU has no network rules. Kubelet pulls; only the two GitHub push identities can push. |
+| ACR | Public endpoint. Basic SKU has no network rules. Kubelet pulls; only the three GitHub push identities can push. |
 
 Egress: all cluster outbound traffic leaves via `ai-sdlc-egress-ip`. No egress filtering, except IMDS for `agents`.
 
@@ -78,7 +78,7 @@ Egress: all cluster outbound traffic leaves via `ai-sdlc-egress-ip`. No egress f
 | `platform` | `Standard_D2s_v5` | 1 | 2 |
 | `agents` | `Standard_D4s_v5` | 1 | 2 |
 
-POC sizing, not a production recommendation. All pools autoscale within these bounds; use start/stop when idle. User-pool scale-to-zero is a [deferred target design (#3)](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/3). Scheduling labels and taints for workloads: see [workload integration](./docs/workload-integration.md#scheduling).
+POC sizing, not a production recommendation. All pools autoscale within these bounds; use start/stop when idle. User-pool scale-to-zero is a [deferred target design (#3)](https://github.com/flok-ai/infrastructure/issues/3). Scheduling labels and taints for workloads: see [workload integration](./docs/workload-integration.md#scheduling).
 
 ### Kubernetes resources
 
@@ -213,9 +213,9 @@ One table per service. Rows are the narrowest scope a grant can land on; columns
 | Database | `platform-services` | `argo-workflow-controller` | `argo-server` |
 |---|:---:|:---:|:---:|
 | `workflow` | Read/write² | | |
-| `argo` | | Not yet granted ([#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33)) | Not yet granted ([#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33)) |
+| `argo` | | Not yet granted ([#33](https://github.com/flok-ai/infrastructure/issues/33)) | Not yet granted ([#33](https://github.com/flok-ai/infrastructure/issues/33)) |
 
-- ² `CONNECT, CREATE` on the database and `USAGE, CREATE` on schema `public`; the app owns the tables it creates. Applied 2026-11-10 ([#31](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/31)).
+- ² `CONNECT, CREATE` on the database and `USAGE, CREATE` on schema `public`; the app owns the tables it creates. Applied 2026-11-10 ([#31](https://github.com/flok-ai/infrastructure/issues/31)).
 
 **Kubernetes API — broker ServiceAccount**
 
@@ -243,17 +243,21 @@ The network rules let every node reach these services. Only the identity grants 
 |---|---|---|
 | `ai-sdlc-control-plane-mi` | AKS control plane | Managed Identity Operator → kubelet identity; Network Contributor → nodes subnet, egress IP |
 | `ai-sdlc-kubelet-mi` | AKS nodes | AcrPull → registry |
-| `ai-sdlc-agent-images-github-push-mi` | GitHub `ai-native-sdlc-agent-images`, `production` environment | AcrPush → registry |
-| `ai-sdlc-platform-services-github-push-mi` | GitHub `ai-native-sdlc-platform-services`, `production` environment | AcrPush → registry |
-| `ai-sdlc-github-broker-github-push-mi` | GitHub `ai-native-sdlc-github-broker`, `production` environment | AcrPush → registry |
-| `platform-stop-github-mi` | GitHub, this repo's `main` branch | Azure Kubernetes Service Contributor Role → cluster; Contributor → PostgreSQL server |
+| `ai-sdlc-agent-images-github-push-mi` | GitHub `flok-ai/agent-images`, `production` environment | AcrPush → registry |
+| `ai-sdlc-platform-services-github-push-mi` | GitHub `flok-ai/platform-services`, `production` environment | AcrPush → registry |
+| `ai-sdlc-github-broker-github-push-mi` | GitHub `flok-ai/github-broker`, `production` environment | AcrPush → registry |
+| `platform-stop-github-mi` | GitHub `flok-ai/infrastructure`, `prod` environment | Azure Kubernetes Service Contributor Role → cluster; Contributor → PostgreSQL server |
 | Key Vault CSI add-on identity | AKS-managed, on every node | None |
 
 ## Unverified
 
-No open checks as of 2026-11-20; completed ones are in the [verification log](./docs/verification-log.md). Add new ones here as features land. No Azure or cluster commands were run by the agent.
+- Before applying [#44](https://github.com/flok-ai/infrastructure/issues/44), list the deployed federated credentials for all four identities with `az identity federated-credential list`. Check the platform stop value in particular: the previous Terraform default used `ref:refs/heads/main`, but both workflow jobs use the `prod` environment.
+- Check that `make plan` shows only the four subject updates.
+- After applying, rerun the three ACR publish workflows and manually dispatch the platform stop workflow to verify sign-in and execution.
 
-Not built yet: Argo database roles and authentication ([#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33)).
+Completed checks are in the [verification log](./docs/verification-log.md).
+
+Not built yet: Argo database roles and authentication ([#33](https://github.com/flok-ai/infrastructure/issues/33)).
 
 ## License
 

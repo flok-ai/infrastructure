@@ -51,21 +51,21 @@ spec:
 ```
 
 - Files appear under `/mnt/agent-secrets/<object-name>`. The agent entrypoint maps the gateway key to `AI_GATEWAY_API_KEY`; coder imports the private key into its private GPG home. Do not print values or pass them through Argo parameters. No Kubernetes Secret synchronization is configured.
-- No GitHub credential is mounted. The shared PAT was retired in [#38](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/38); the workflow gets short-lived GitHub tokens from the broker.
+- No GitHub credential is mounted. The shared PAT was retired in [#38](https://github.com/flok-ai/infrastructure/issues/38); the workflow gets short-lived GitHub tokens from the broker.
 - CSI uses workload identity; the node CSI add-on identity gets no grant. Per-run HMAC tokens remain with foreman.
 
 > [!IMPORTANT]
-> **ADR discrepancy:** [ADR-003](https://github.com/julie-ng/ai-native-sdlc/blob/main/architecture/decisions/003-platform-services-vs-agent-pods.md) still limits the exception to the signing key. The human decision in #26 (2026-11-07) supersedes that limit for these long-lived secrets; the parent ADR update is pending.
+> **ADR discrepancy:** [ADR-003](https://github.com/flok-ai/flok/blob/main/architecture/decisions/003-platform-services-vs-agent-pods.md) still describes the temporary shared PAT and lists the token broker as unbuilt. The live broker now issues short-lived GitHub tokens, and #38 retired the shared PAT.
 
 ## Platform services (#29)
 
 - Run as ServiceAccount `platform-services` in `platform`.
 - SecretProviderClass `platform-services-secrets` uses `platform-services-mi`. Mount it read-only at `/mnt/secrets` to read `platform-services-admin-token` and `platform-services-hmac-key`. No Kubernetes Secret synchronization is configured.
-- The Deployment, workload-identity pod label and volume mount live in [platform-services](https://github.com/julie-ng/ai-native-sdlc-platform-services/issues/45).
+- The Deployment, workload-identity pod label and volume mount live in [platform-services](https://github.com/flok-ai/platform-services/issues/45).
 
 ## GitHub token broker
 
 - Runs as ServiceAccount `token-broker` in `github-broker`, annotated for `gh-token-broker-mi`.
 - SecretProviderClass `github-broker-secrets` (root variable `github_broker_secret_provider_class_name`) mounts the single file `token-broker-gh-app-private-key`. The broker Deployment must set the workload-identity pod label and mount this CSI volume read-only; no Kubernetes Secret synchronization is configured.
 - Its Kubernetes API token needs permission to create TokenReviews and get pods in `agents`; Terraform grants only those two permissions. The Deployment and Service remain in the broker repository.
-- Its repository's `production` GitHub environment uses the client ID from `github_workflows.github_broker.client_id` for OIDC image pushes. The federated subject is `repo:julie-ng@1269507/ai-native-sdlc-github-broker@1433193704:environment:production`; matching the emitted subject and a successful push remain unverified until the human-run workflow.
+- Its repository's `production` GitHub environment uses the client ID from `github_workflows.github_broker.client_id` for OIDC image pushes. The federated subject is `repo:flok-ai@359029669/github-broker@1433193704:environment:production`; matching the emitted subject and a successful push remain unverified until the human-run workflow.

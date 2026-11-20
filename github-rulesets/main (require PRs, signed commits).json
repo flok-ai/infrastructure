@@ -3,7 +3,7 @@
   "name": "main (require PRs, signed commits)",
   "target": "branch",
   "source_type": "Repository",
-  "source": "julie-ng/ai-native-sdlc-agent-images",
+  "source": "flok-ai/agent-images",
   "enforcement": "active",
   "conditions": {
     "ref_name": {

@@ -76,7 +76,7 @@ platform_stop = {
   identity_name = "platform-stop-github-mi"
   issuer        = "https://token.actions.githubusercontent.com"
   audience      = "api://AzureADTokenExchange"
-  subject       = "repo:julie-ng/ai-native-sdlc-infrastructure:ref:refs/heads/main"
+  subject       = "repo:flok-ai@359029669/infrastructure@1429349598:environment:prod"
   aks_role      = "Azure Kubernetes Service Contributor Role"
   postgres_role = "Contributor"
 }

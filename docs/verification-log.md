@@ -18,7 +18,7 @@ Provisioning of all infrastructure modules was confirmed on 2026-10-22: networki
 - [x] `make reset-sdlc-secrets`: run and the resulting values checked in Azure Portal on 2026-11-05; `token-broker-gh-app-private-key` remained unchanged. Temporary GPG isolation/cleanup and key properties were checked offline with mocked uploads.
 - [x] `make init-kv-secrets` against Azure: created the missing placeholders (every listed secret exists and the platform runs on the populated values), and a rerun in the week of 2026-11-09 skipped every existing secret without replacing values. Firewall/RBAC denial is Azure's behavior, not this script's, and is not tracked.
 - [x] #19 identity replacement: plan reviewed and applied on 2026-11-05. `workflow-service-mi` and `artifact-service-mi` were replaced by `platform-services-mi`, `token-broker-mi` by `gh-token-broker-mi`, and `foreman-mi` was added. Workload-identity `prevent_destroy` was restored afterwards.
-- [x] `platform-services-mi` database grants on `workflow` applied on 2026-11-10; `has_database_privilege('platform-services-mi', 'workflow', 'CREATE')` returns `t` ([#31](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/31)).
+- [x] `platform-services-mi` database grants on `workflow` applied on 2026-11-10; `has_database_privilege('platform-services-mi', 'workflow', 'CREATE')` returns `t` ([#31](https://github.com/flok-ai/infrastructure/issues/31)).
 
 ## Initial release (2026-11-10 to 2026-11-11)
 
@@ -35,7 +35,7 @@ End to end on 2026-11-11: workflow `initial-release-gxqw4` (`foreman → planner
 
 ## GitHub token broker (2026-11-13 to 2026-11-18)
 
-Live proof on 2026-11-18 passed 9 of 9 checks from test pods in `agents`; see the [broker README](https://github.com/julie-ng/ai-native-sdlc-github-broker#live-verification). The checks below are what it proved for this repo.
+Live proof on 2026-11-18 passed 9 of 9 checks from test pods in `agents`; see the [broker README](https://github.com/flok-ai/github-broker#live-verification). The checks below are what it proved for this repo.
 
 - [x] #36 ACR push: the broker repository's `production` workflow exchanged its OIDC token and pushed the image to ACR (2026-11-13; the first attempt failed with `AADSTS700211` and succeeded on re-run).
 - [x] #36 broker RBAC (2026-11-18): `create tokenreviews` and `get pods -n agents` return `yes`; `get secrets -n agents` and `list pods -n agents` return `no`, checked with `kubectl auth can-i … --as=system:serviceaccount:github-broker:token-broker`.
@@ -47,7 +47,7 @@ Live proof on 2026-11-18 passed 9 of 9 checks from test pods in `agents`; see th
 - [x] Plan and apply: only the two `github_pat` grants for `planner-mi` and `coder-mi` were destroyed, and `planner-secrets` and `coder-secrets` were updated in place; the `ai_gateway` and GPG key grants are unchanged.
 - [x] Neither SecretProviderClass references the PAT any more: `kubectl get secretproviderclass planner-secrets coder-secrets -n agents -o yaml | grep -c github-pat` returns `0`.
 - [x] After the apply, an `initial-release` run on the test repository's issue #5 succeeded end to end with broker tokens ([aks-architect-ai#8](https://github.com/julie-ng/aks-architect-ai/pull/8)): the PR was opened by `julieio-ai-sdlc[bot]`, its commit by `julieio-goose` shows **Verified**, and CI passed.
-- [x] The PAT is revoked on GitHub. Deleting the Key Vault secret is tracked in [#41](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/41).
+- [x] The PAT is revoked on GitHub. Deleting the Key Vault secret is tracked in [#41](https://github.com/flok-ai/infrastructure/issues/41).
 
 ## Access re-checked (2026-11-20)
 
@@ -79,7 +79,7 @@ Log Analytics queries on the `Usage` and `ContainerLogV2` tables.
 
 ## Agent pod restrictions (#4, 2026-10-25)
 
-[Details](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/4#issuecomment-6394927018). The deployed cluster was switched to Cilium in place on 2026-10-24; the apply reimaged all pools (about 9 minutes).
+[Details](https://github.com/flok-ai/infrastructure/issues/4#issuecomment-6394927018). The deployed cluster was switched to Cilium in place on 2026-10-24; the apply reimaged all pools (about 9 minutes).
 
 - [x] `make plan-cluster` showed an in-place update, not a replace. Cilium runs on every node; no kube-proxy pods.
 - [x] From a pod in `agents`, IMDS instance metadata and token requests time out (`curl -s -H Metadata:true --connect-timeout 10 "http://169.254.169.254/metadata/instance?api-version=2023-11-15"`).

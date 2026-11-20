@@ -49,7 +49,7 @@ resource "azurerm_federated_identity_credential" "github_agent_images_prod_envir
   audience                  = ["api://AzureADTokenExchange"]                # per MSFT docs
   issuer                    = "https://token.actions.githubusercontent.com" # per GitHub Docs
   user_assigned_identity_id = azurerm_user_assigned_identity.github_agent_images_mi.id
-  subject                   = "repo:julie-ng@1269507/ai-native-sdlc-agent-images@1428424091:environment:production" # immutable subject claim
+  subject                   = "repo:flok-ai@359029669/agent-images@1428424091:environment:production" # immutable subject claim
 }
 
 # =================================================
@@ -75,7 +75,7 @@ resource "azurerm_federated_identity_credential" "github_platform_services_prod_
   audience                  = ["api://AzureADTokenExchange"]                # per MSFT docs
   issuer                    = "https://token.actions.githubusercontent.com" # per GitHub Docs
   user_assigned_identity_id = azurerm_user_assigned_identity.github_platform_services_mi.id
-  subject                   = "repo:julie-ng@1269507/ai-native-sdlc-platform-services@1431106684:environment:production" # immutable subject claim
+  subject                   = "repo:flok-ai@359029669/platform-services@1431106684:environment:production" # immutable subject claim
 }
 
 # =================================================
@@ -101,5 +101,5 @@ resource "azurerm_federated_identity_credential" "github_broker_prod_environment
   audience                  = ["api://AzureADTokenExchange"]                # per MSFT docs
   issuer                    = "https://token.actions.githubusercontent.com" # per GitHub Docs
   user_assigned_identity_id = azurerm_user_assigned_identity.github_broker_mi.id
-  subject                   = "repo:julie-ng@1269507/ai-native-sdlc-github-broker@1433193704:environment:production" # immutable subject claim
+  subject                   = "repo:flok-ai@359029669/github-broker@1433193704:environment:production" # immutable subject claim
 }

@@ -7,7 +7,7 @@ Project-specific instructions for any agent working in this repo, alongside the 
 
 ## About this repo
 
-- Terraform for the AI SDLC platform on Azure: one AKS cluster plus its backing services. Single environment (`dev`).
+- Terraform for [flok](https://github.com/flok-ai) on Azure: one AKS cluster plus its backing services. Single environment (`dev`).
 - Infrastructure choices and trade-offs: [`docs/decisions-log.md`](./docs/decisions-log.md). Read it before changing anything.
 
 ## Reading order
@@ -40,7 +40,7 @@ If an ADR and this repo disagree, flag it to the human developer. Don't silently
 - **Entra ID over keys.** Shared keys stay off on storage. Postgres is Entra-only. ACR admin user stays off.
 - **Agent pods get no cloud identity except approved secret reads (ADR-003, #18, #26, #38).** `coder` and `planner` each have a dedicated identity with `Key Vault Secrets User`, assigned separately on each secret they need: `coder` reads the signing key and AI gateway key; `planner` reads only the gateway key. No agent holds a standing GitHub credential; GitHub tokens come from the broker. `reviewer`, `open-pr` and `argo-executor` have no identity. Any further agent cloud access needs an explicit decision from the human developer.
 - **Least privilege per identity.** Scope role assignments to the narrowest resource, e.g. a container rather than its account. Don't share an identity between components with different access needs.
-- **Only GitHub Actions pushes to ACR.** `AcrPush` goes only to the three GitHub OIDC identities, each federated to the `production` environment of one repo (`ai-native-sdlc-agent-images`, `ai-native-sdlc-platform-services`, `ai-native-sdlc-github-broker`). Nothing in the cluster gets push.
+- **Only GitHub Actions pushes to ACR.** `AcrPush` goes only to the three GitHub OIDC identities, each federated to the `production` environment of one repo (`flok-ai/agent-images`, `flok-ai/platform-services`, `flok-ai/github-broker`). Nothing in the cluster gets push.
 - **Config is not a boundary.** Network rules, firewall rules and RBAC are mitigations. Name what they actually enforce.
 
 ## Terraform conventions

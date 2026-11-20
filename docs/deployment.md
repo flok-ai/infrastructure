@@ -67,7 +67,7 @@ make start-cluster
 
 - `AKS_RESOURCE_GROUP`, `AKS_CLUSTER_NAME`, `POSTGRES_RESOURCE_GROUP` and `POSTGRES_SERVER_NAME` default to the local `platform_stop` Terraform output; override them in your shell or as Make variables. The commands fail before calling Azure if a value is empty.
 - Start the platform before running Terraform against Kubernetes resources.
-- The **Platform stop** GitHub workflow is manual-only and stops AKS and PostgreSQL in parallel jobs. Copy `terraform output -json platform_stop` values into repository Actions variables. The output uses the workflow's `AZ_POSTGRES_RESOURCE_GROUP` / `AZ_POSTGRES_SERVER_NAME` names. OIDC trusts this repository's `main` branch. Scheduling is deferred to [#14](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/14).
+- The **Platform stop** GitHub workflow runs daily at 20:00 UTC and on manual dispatch. It stops AKS and PostgreSQL in parallel jobs. Copy `terraform output -json platform_stop` values into repository Actions variables. The output uses the workflow's `AZ_POSTGRES_RESOURCE_GROUP` / `AZ_POSTGRES_SERVER_NAME` names. Both jobs use the `prod` environment, which is the context in the OIDC subject for `flok-ai/infrastructure`.
 - [AKS considerations](https://learn.microsoft.com/en-us/azure/aks/start-stop-cluster): restart depends on capacity; wait 15–30 minutes after stopping before starting. Standalone pods are deleted. [PostgreSQL restarts automatically after seven days](https://learn.microsoft.com/en-us/azure/postgresql/configure-maintain/how-to-stop-server); storage and other retained services remain billable.
 
 ## Install Argo Workflows
@@ -124,7 +124,7 @@ Kept out of Terraform so secrets never land in state, or because no azurerm reso
 
   Enter `\c workflow` on its own line; if pasted together with the next SQL statement, psql reads that statement as connection arguments. The app runs its own startup migrations as `platform-services-mi`, so it owns its tables and the `drizzle` journal schema. Database `CREATE` permits schema creation; schema `CREATE` permits table creation. PostgreSQL 15+ does not grant regular roles `CREATE` on `public` by default ([schema privileges](https://www.postgresql.org/docs/17/ddl-schemas.html#DDL-SCHEMAS-PRIV)).
 
-  Argo roles for `argo-workflow-controller-mi` and `argo-server-mi` in the `argo` database are tracked in [#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33).
+  Argo roles for `argo-workflow-controller-mi` and `argo-server-mi` in the `argo` database are tracked in [#33](https://github.com/flok-ai/infrastructure/issues/33).
 
 - **Local-dev service principal credential.** `{name}-local-dev` has no secret in Terraform. Run `make local-dev-credential` (`az ad app credential reset --append --years 1`), copy the secret from the terminal into a password manager or git-ignored file, and keep it out of the repo.
 
