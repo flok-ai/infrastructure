@@ -39,7 +39,7 @@ Live proof on 2026-11-18 passed 9 of 9 checks from test pods in `agents`; see th
 - [x] #36 ACR push: the broker repository's `production` workflow exchanged its OIDC token and pushed the image to ACR (2026-11-13; the first attempt failed with `AADSTS700211` and succeeded on re-run).
 - [x] #36 broker RBAC (2026-11-18): `create tokenreviews` and `get pods -n agents` return `yes`; `get secrets -n agents` and `list pods -n agents` return `no`, checked with `kubectl auth can-i … --as=system:serviceaccount:github-broker:token-broker`.
 - [x] #36 broker CSI mount: the broker pod in `github-broker` mounts `token-broker-gh-app-private-key` from `github-broker-secrets` through `gh-token-broker-mi`, and signs App JWTs with it; issued installation tokens worked against GitHub. No token appeared in the broker log.
-- [x] #36 plan: applied 2026-11-13 with the expected eight new resources and no changes to existing ones. Confirmed by the human developer from memory; the plan output was not recorded.
+- [x] #36 resources (2026-11-20): `terraform state list` contains all eight: the `github_broker_secrets` SecretProviderClass, the `token_broker` ClusterRole, ClusterRoleBinding, Role and RoleBinding, `github_broker_mi`, its `github_broker_prod_environment` federated credential and `github_broker_acr_push`. `make plan` reports no changes. The original 2026-11-13 plan output was not recorded.
 
 ## Shared PAT retired (#38, 2026-11-20)
 
