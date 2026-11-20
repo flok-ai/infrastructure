@@ -251,10 +251,6 @@ The network rules let every node reach these services. Only the identity grants 
 
 ## Unverified
 
-Open checks; completed ones are in the [verification log](./docs/verification-log.md). No Azure or cluster commands were run by the agent.
+No open checks as of 2026-11-20; completed ones are in the [verification log](./docs/verification-log.md). Add new ones here as features land. No Azure or cluster commands were run by the agent.
 
-- [ ] Monitoring table selection, ConfigMap filters, observed ingestion volume and cap behavior. Successful resource deployment does not prove logs are flowing or filtering correctly.
-
-### Not built yet
-
-- Argo database roles and authentication: [#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33).
+Not built yet: Argo database roles and authentication ([#33](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/33)).

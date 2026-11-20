@@ -64,6 +64,14 @@ Read-only checks after the broker and PAT changes.
 - [x] `foreman` ServiceAccount: `kubectl auth can-i` returns `no` for get/list/update/patch/delete on Secrets and get/list on Workflows in `agents`.
 - [x] `foreman-admin-token` cannot be mounted by another ServiceAccount: a labeled `planner` pod using that SecretProviderClass stayed in `ContainerCreating` with `FailedMount`, `ClientAssertionCredential authentication failed … 401 Unauthorized` (`foreman-mi` has no federation for `agents:planner`).
 
+## Monitoring (2026-11-20)
+
+Log Analytics queries on the `Usage` and `ContainerLogV2` tables.
+
+- [x] Tables, last 7 days: only `ContainerLogV2` (0.8 MB), `KubePodInventory` (0.7 MB), `Heartbeat` (0.6 MB) and `KubeEvents` (0.1 MB). No `Perf`, `InsightsMetrics` or other inventory tables.
+- [x] Volume, last 14 days: at most 1.7 MB on any day the cluster ran, against the 0.1 GB/day cap. The cap was never reached, so cap behavior itself was not observed; it is Azure's documented behavior.
+- [x] Container log filter, last 7 days: lines only from `agents`, `github-broker`, `argo` and `platform`; nothing from `kube-system` or the other excluded namespaces.
+
 ## Argo Workflows (2026-11-05)
 
 - [x] Applied the four controller RBAC resources, installed chart 2.0.16 / Argo v4.1.6, and created the executor token Secret. Workflow `hello-world-7xzjr` succeeded in `agents` as `planner` (1/1 step, 20 seconds), confirming executor result reporting under `deny-imds`.
