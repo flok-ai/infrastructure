@@ -16,6 +16,7 @@ Provisioning of all infrastructure modules was confirmed on 2026-10-22: networki
 
 - [x] `local-dev` service principal: Entra app registration created by the applying identity, credential created with `make local-dev-credential`, and user delegation SAS URLs generated with it against the `artifacts` account.
 - [x] `make reset-sdlc-secrets`: run and the resulting values checked in Azure Portal on 2026-11-05; `token-broker-gh-app-private-key` remained unchanged. Temporary GPG isolation/cleanup and key properties were checked offline with mocked uploads.
+- [x] `make init-kv-secrets` against Azure: created the missing placeholders (every listed secret exists and the platform runs on the populated values), and a rerun in the week of 2026-11-09 skipped every existing secret without replacing values. Firewall/RBAC denial is Azure's behavior, not this script's, and is not tracked.
 - [x] #19 identity replacement: plan reviewed and applied on 2026-11-05. `workflow-service-mi` and `artifact-service-mi` were replaced by `platform-services-mi`, `token-broker-mi` by `gh-token-broker-mi`, and `foreman-mi` was added. Workload-identity `prevent_destroy` was restored afterwards.
 - [x] `platform-services-mi` database grants on `workflow` applied on 2026-11-10; `has_database_privilege('platform-services-mi', 'workflow', 'CREATE')` returns `t` ([#31](https://github.com/julie-ng/ai-native-sdlc-infrastructure/issues/31)).
 

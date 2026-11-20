@@ -253,7 +253,6 @@ The network rules let every node reach these services. Only the identity grants 
 
 Open checks; completed ones are in the [verification log](./docs/verification-log.md). No Azure or cluster commands were run by the agent.
 
-- [ ] Key Vault seed command against Azure: creates missing placeholders, preserves Portal-created versions on rerun, and fails cleanly if firewall/RBAC denies access. Verified offline with mocked CLI calls only.
 - [ ] `foreman`: an unrelated ServiceAccount cannot mount `foreman-admin-token` using foreman's identity. Needs a test pod; not attempted.
 - [ ] Monitoring table selection, ConfigMap filters, observed ingestion volume and cap behavior. Successful resource deployment does not prove logs are flowing or filtering correctly.
 
