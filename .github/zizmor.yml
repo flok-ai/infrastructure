@@ -1,0 +1,8 @@
+# zizmor configuration: https://docs.zizmor.sh/configuration/
+rules:
+  unpinned-uses:
+    config:
+      policies:
+        # Follow the broker version-tag policy for the Azure sign-in action.
+        "azure/login": ref-pin
+        "*": hash-pin
