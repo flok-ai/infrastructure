@@ -40,6 +40,10 @@ resource "azurerm_storage_account" "storage" {
     virtual_network_subnet_ids = [var.aks_nodes_subnet_id]
     ip_rules                   = local.storage_ip_rules
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Created via the management plane (storage_account_id), so the network rules above don't block Terraform.
@@ -48,6 +52,10 @@ resource "azurerm_storage_container" "containers" {
   name                  = each.value.container
   storage_account_id    = azurerm_storage_account.storage[each.key].id
   container_access_type = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Admin can browse and manage blobs in the portal (data plane). Account scope, not container: the
@@ -83,6 +91,10 @@ resource "azurerm_storage_container" "local_dev" {
   name                  = "local-dev"
   storage_account_id    = azurerm_storage_account.storage["artifacts"].id
   container_access_type = "private"
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "azurerm_role_assignment" "local_dev_blob_contributor" {

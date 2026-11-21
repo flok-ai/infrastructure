@@ -8,7 +8,8 @@ gpg_private_key_secret='agent-gpg-private-key'
 gpg_public_key_secret='agent-gpg-public-key'
 gpg_fingerprint_secret='agent-gpg-fingerprint'
 
-# Make runs this script from the repository root.
+# Make runs this script from the repository root. The operator supplies the local env file.
+# shellcheck source=/dev/null
 source scripts/.env
 
 # KV name from Terraform output
