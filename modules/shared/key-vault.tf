@@ -22,6 +22,10 @@ resource "azurerm_key_vault" "kv" {
     virtual_network_subnet_ids = [var.aks_nodes_subnet_id]
     ip_rules                   = var.admin_ip_ranges
   }
+
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Admin can manage secrets (data plane). Still needs an allowed IP to reach the vault.

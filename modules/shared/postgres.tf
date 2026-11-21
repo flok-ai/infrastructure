@@ -26,6 +26,7 @@ resource "azurerm_postgresql_flexible_server" "postgres" {
   }
 
   lifecycle {
+    prevent_destroy = true
     ignore_changes = [
       zone # Azure picks one if unset
     ]
