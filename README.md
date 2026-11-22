@@ -1,5 +1,7 @@
 # flok infrastructure
 
+[![Maintainability](https://qlty.sh/gh/flok-ai/projects/infrastructure/maintainability.svg)](https://qlty.sh/gh/flok-ai/projects/infrastructure)
+
 Terraform for [flok](https://github.com/flok-ai) on Azure: one AKS cluster plus the backing services it needs. Single environment (dev).
 
 > [!IMPORTANT]
