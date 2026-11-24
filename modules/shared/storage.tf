@@ -33,9 +33,9 @@ resource "azurerm_storage_account" "storage" {
   default_to_oauth_authentication = true
   allow_nested_items_to_be_public = false
 
-  # Public endpoint, reachable only from the AKS subnet (service endpoint) and admin IPs
+  # Keep the normal rules configured so they take effect again when the exception ends.
   network_rules {
-    default_action             = "Deny"
+    default_action             = var.temporary_public_access ? "Allow" : "Deny"
     bypass                     = ["AzureServices"]
     virtual_network_subnet_ids = [var.aks_nodes_subnet_id]
     ip_rules                   = local.storage_ip_rules

@@ -36,6 +36,12 @@ variable "admin_ip_ranges" {
   default     = []
 }
 
+variable "temporary_public_access" {
+  type        = bool
+  description = "Allow public connections from any IPv4 source while the temporary exception is enabled."
+  default     = false
+}
+
 # Postgres
 # --------
 

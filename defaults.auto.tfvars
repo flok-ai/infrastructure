@@ -10,6 +10,8 @@ default_tags = {
 # Set in git-ignored `private.auto.tfvars`, see docs/deployment.md:
 #   admin_ip_ranges = ["x.x.x.x/32"]
 
+temporary_public_access = false
+
 # ============
 #  Networking
 # ============

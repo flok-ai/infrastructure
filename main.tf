@@ -52,6 +52,8 @@ module "shared" {
   egress_ip_address   = module.networking.public_ips.egress.ip_address
   admin_ip_ranges     = var.admin_ip_ranges
 
+  temporary_public_access = var.temporary_public_access
+
   # Postgres
   postgres_version   = var.postgres_version
   postgres_sku_name  = var.postgres_sku_name
