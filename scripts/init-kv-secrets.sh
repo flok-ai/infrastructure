@@ -9,7 +9,6 @@ secret_names=(
   agent-gpg-private-key            # placeholder, tagged → GPG script
   agent-gpg-public-key             # placeholder, tagged → GPG script
   agent-gpg-fingerprint            # placeholder, tagged → GPG script
-  julieio-goose-github-pat          # populated by hand
   vercel-ai-gateway-api-key         # populated by hand
   argo-executor-token              # populated by hand
 )
