@@ -138,10 +138,10 @@ Kept out of Terraform so secrets never land in state, or because no azurerm reso
 
 - **Key Vault secrets.** After the shared module apply, run `make init-kv-secrets` with your Azure CLI login and an allowed admin IP. It reads the vault name from the saved `summary.shared.key_vault.name` output; if that output is not saved yet, use `KEY_VAULT_NAME=<vault-name> make init-kv-secrets`.
   - Secret names and the bootstrap value are editable at the top of [`scripts/init-kv-secrets.sh`](../scripts/init-kv-secrets.sh).
-  - Creates `platform-services-admin-token`, `platform-services-hmac-key`, `token-broker-gh-app-private-key`, `agent-gpg-private-key`, `agent-gpg-public-key`, `agent-gpg-fingerprint`, `julieio-goose-github-pat`, `vercel-ai-gateway-api-key` and `argo-executor-token` with the literal placeholder `INIT-ONLY-CHANGE-ME`.
+  - Creates `platform-services-admin-token`, `platform-services-hmac-key`, `token-broker-gh-app-private-key`, `agent-gpg-private-key`, `agent-gpg-public-key`, `agent-gpg-fingerprint`, `vercel-ai-gateway-api-key` and `argo-executor-token` with the literal placeholder `INIT-ONLY-CHANGE-ME`.
   - To populate the admin token, HMAC key and GPG values, set `AGENT_GPG_USER_NAME` and `AGENT_GPG_USER_EMAIL` in git-ignored `scripts/.env`, then run `make reset-sdlc-secrets` from the repository root. Requires `openssl`, `gpg` and `gpgconf` as well as Azure CLI.
   - Reset creates two independent 32-byte random values (base64) and an Ed25519 signing key valid for one year, without a passphrase for unattended use. It creates new versions even when real values already exist. Updates are sequential: a failure can leave a partial reset.
-  - Populate `token-broker-gh-app-private-key`, `julieio-goose-github-pat`, `vercel-ai-gateway-api-key` and `argo-executor-token` by hand in the Azure Portal; reset leaves these untouched.
+  - Populate `token-broker-gh-app-private-key`, `vercel-ai-gateway-api-key` and `argo-executor-token` by hand in the Azure Portal; reset leaves these untouched.
   - Initialization skips existing secrets. Run one initialization command at a time, before replacing values: the list/create sequence is not atomic.
   - Values are never managed or read by Terraform, so they do not enter Terraform state.
 
