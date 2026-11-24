@@ -67,7 +67,7 @@ make start-cluster
 
 - `AKS_RESOURCE_GROUP`, `AKS_CLUSTER_NAME`, `POSTGRES_RESOURCE_GROUP` and `POSTGRES_SERVER_NAME` default to the local `platform_stop` Terraform output; override them in your shell or as Make variables. The commands fail before calling Azure if a value is empty.
 - Start the platform before running Terraform against Kubernetes resources.
-- The **Platform stop** GitHub workflow runs daily at 20:00 UTC and on manual dispatch. It stops AKS and PostgreSQL in parallel jobs. Copy `terraform output -json platform_stop` values into repository Actions variables. The output uses the workflow's `AZ_POSTGRES_RESOURCE_GROUP` / `AZ_POSTGRES_SERVER_NAME` names. Both jobs use the `prod` environment, which is the context in the OIDC subject for `flok-ai/infrastructure`.
+- The **Platform stop** GitHub workflow is scheduled daily at 20:17 Munich time (`Europe/Berlin`) and can be dispatched manually. GitHub can delay scheduled starts. The workflow stops AKS and PostgreSQL in parallel jobs. Copy `terraform output -json platform_stop` values into repository Actions variables. The output uses the workflow's `AZ_POSTGRES_RESOURCE_GROUP` / `AZ_POSTGRES_SERVER_NAME` names. Both jobs use the `prod` environment, which is the context in the OIDC subject for `flok-ai/infrastructure`.
 - [AKS considerations](https://learn.microsoft.com/en-us/azure/aks/start-stop-cluster): restart depends on capacity; wait 15–30 minutes after stopping before starting. Standalone pods are deleted. [PostgreSQL restarts automatically after seven days](https://learn.microsoft.com/en-us/azure/postgresql/configure-maintain/how-to-stop-server); storage and other retained services remain billable.
 
 ## Install Argo Workflows

@@ -253,6 +253,7 @@ The network rules let every node reach these services. Only the identity grants 
 
 ## Unverified
 
+- After the platform stop schedule change reaches the default branch, verify that GitHub schedules a run for 20:17 in `Europe/Berlin`. Check actual start times in Actions for scheduling delays.
 - Before applying [#44](https://github.com/flok-ai/infrastructure/issues/44), list the deployed federated credentials for all four identities with `az identity federated-credential list`. Check the platform stop value in particular: the previous Terraform default used `ref:refs/heads/main`, but both workflow jobs use the `prod` environment.
 - Check that `make plan` shows only the four subject updates.
 - After applying, rerun the three ACR publish workflows and manually dispatch the platform stop workflow to verify sign-in and execution.
