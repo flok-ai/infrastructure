@@ -78,3 +78,12 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "admin" {
   start_ip_address = cidrhost(each.value, 0)
   end_ip_address   = cidrhost(each.value, -1)
 }
+
+# Use a separate rule so ending the exception leaves the cluster and admin rules intact.
+resource "azurerm_postgresql_flexible_server_firewall_rule" "temporary_public_access" {
+  count            = var.temporary_public_access ? 1 : 0
+  name             = "travel-week"
+  server_id        = azurerm_postgresql_flexible_server.postgres.id
+  start_ip_address = "0.0.0.0"
+  end_ip_address   = "255.255.255.255"
+}

@@ -37,6 +37,12 @@ variable "admin_ip_ranges" {
   default     = []
 }
 
+variable "temporary_public_access" {
+  type        = bool
+  description = "Temporarily allow any public IPv4 source to reach Key Vault, Storage and PostgreSQL. Restore false and apply to reinstate network restrictions."
+  default     = false
+}
+
 # ============
 #  Networking
 # ============

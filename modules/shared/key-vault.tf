@@ -15,9 +15,9 @@ resource "azurerm_key_vault" "kv" {
   purge_protection_enabled   = false # so we can fully delete it
   tags                       = var.tags
 
-  # Public endpoint, reachable only from the AKS subnet (service endpoint) and admin IPs
+  # Keep the normal rules configured so they take effect again when the exception ends.
   network_acls {
-    default_action             = "Deny"
+    default_action             = var.temporary_public_access ? "Allow" : "Deny"
     bypass                     = "AzureServices"
     virtual_network_subnet_ids = [var.aks_nodes_subnet_id]
     ip_rules                   = var.admin_ip_ranges

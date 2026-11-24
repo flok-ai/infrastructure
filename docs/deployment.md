@@ -15,6 +15,14 @@ admin_ip_ranges = ["x.x.x.x/32"]
 > [!IMPORTANT]
 > CIDR notation is required. For a single IPv4 address, append `/32`.
 
+### Temporary access from changing IP addresses
+
+1. Set `temporary_public_access = true` in your git-ignored `private.auto.tfvars`. Keep your usual `admin_ip_ranges` entries.
+2. Run `make plan-shared` and review the plan. Expect the Key Vault and both Storage firewall default actions to change to `Allow` and a PostgreSQL `travel-week` rule to be added for all IPv4 addresses. Run `make apply`.
+3. At the end of the access window, remove the override. Run `make plan-shared` and verify that Key Vault and both Storage accounts return to `Deny` and that the PostgreSQL rule is deleted. Run `make apply`.
+
+The exception has no automatic expiration. Use the same local override for each apply of the shared module during the access window. Authentication and resource permissions still apply, and active Blob SAS URLs can be used from any network permitted by the SAS.
+
 ### Log in to Azure
 
 Terraform authenticates via the ambient Azure CLI session, not a stored credential:
